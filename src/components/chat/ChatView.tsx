@@ -40,18 +40,17 @@ export function ChatView() {
     overscan: 5,
   });
 
-  // Auto-scroll to bottom when new messages arrive
-  useEffect(() => {
+  // Auto-scroll to bottom smoothly when new messages arrive or content grows
+  useLayoutEffect(() => {
     const el = scrollRef.current;
     if (!el) return;
 
-    if (isScrolledToBottomRef.current) {
-      // If virtualized, we scroll to the last index
-      if (messages.length > 0) {
-        rowVirtualizer.scrollToIndex(messages.length - 1, { align: 'end' });
-      }
+    if (isScrolledToBottomRef.current && messages.length > 0) {
+      // scrollToOffset with the total size guarantees we stick to the absolute bottom
+      // This eliminates the "jerkiness" of scrollToIndex during rapid streaming
+      rowVirtualizer.scrollToOffset(rowVirtualizer.getTotalSize(), { align: 'end' });
     }
-  }, [messages.length, messages[messages.length - 1]?.content.length, rowVirtualizer]);
+  }, [messages.length, messages[messages.length - 1]?.content.length, rowVirtualizer.getTotalSize()]);
 
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;

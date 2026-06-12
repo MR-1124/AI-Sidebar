@@ -8,7 +8,7 @@
 //   - context-manager.ts (sliding window context trimming)
 // ─────────────────────────────────────────────────────────────
 
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useRef, useState, useEffect } from 'react';
 import { useChatStore } from '../stores/chat-store';
 import { useModelStore } from '../stores/model-store';
 import { useSettingsStore } from '../stores/settings-store';
@@ -464,6 +464,13 @@ export function useChat() {
     // Re-send triggers a new assistant message (which becomes the new branch)
     await sendMessage(lastUserMessage.content);
   }, [sendMessage]);
+
+  // Listen for global stop generation events (e.g. from Escape key shortcuts)
+  useEffect(() => {
+    const handleStopEvent = () => stopGeneration();
+    window.addEventListener('aiside-stop-generation', handleStopEvent);
+    return () => window.removeEventListener('aiside-stop-generation', handleStopEvent);
+  }, [stopGeneration]);
 
   return {
     sendMessage,

@@ -4,7 +4,7 @@
 
 import React, { useState, useCallback } from 'react';
 import { Check, Copy, ChevronDown, ChevronRight, Play, Code } from 'lucide-react';
-import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { PrismAsyncLight as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 import { ArtifactPreview } from './ArtifactPreview';
 

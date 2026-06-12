@@ -6,38 +6,33 @@ import { DEFAULT_SHORTCUTS } from '../lib/constants';
 export function useGlobalShortcuts() {
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Allow default browser shortcuts (like Ctrl+Shift+I) to pass through
-      if (e.altKey || e.shiftKey && e.key !== 'Escape') {
-        return; // We only handle pure Ctrl/Meta bindings for now
+      // Allow default browser shortcuts to pass through
+      if (e.ctrlKey || e.metaKey || (e.shiftKey && e.key !== 'Escape')) {
+        return; // We only handle pure Alt bindings for global shortcuts now
       }
 
       const target = e.target as HTMLElement;
       const isInputFocused = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
       
-      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
       const key = e.key.toLowerCase();
 
       // --- Stop Generation (Escape) ---
       if (key === 'escape') {
-        const { isGenerating, activeRequestId, setGenerating } = useUIStore.getState();
+        const { isGenerating, activeRequestId } = useUIStore.getState();
         if (isGenerating && activeRequestId) {
           e.preventDefault();
-          chrome.runtime.sendMessage({
-            type: 'STOP_GENERATION',
-            payload: { requestId: activeRequestId },
-          });
-          setGenerating(false);
+          window.dispatchEvent(new CustomEvent('aiside-stop-generation'));
           return;
         }
       }
 
       // If we are typing in an input and no modifier is pressed, ignore shortcuts
-      if (isInputFocused && !isCtrlOrCmd) {
+      if (isInputFocused && !e.altKey) {
         return;
       }
 
-      // --- Global Shortcuts ---
-      if (isCtrlOrCmd) {
+      // --- Global Shortcuts (Alt-based) ---
+      if (e.altKey) {
         switch (key) {
           case 'n':
             e.preventDefault();

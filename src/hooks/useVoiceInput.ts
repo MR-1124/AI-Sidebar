@@ -47,9 +47,20 @@ export function useVoiceInput(): VoiceInputResult {
     };
   }, []);
 
-  const start = useCallback(() => {
+  const start = useCallback(async () => {
     if (!SpeechRecognition) {
       setError('Speech recognition is not supported in this browser.');
+      return;
+    }
+
+    try {
+      // Proactively request microphone permission.
+      // In Chrome extensions/side panels, SpeechRecognition often fails silently
+      // if permission hasn't been explicitly granted via getUserMedia first.
+      await navigator.mediaDevices.getUserMedia({ audio: true });
+    } catch (err) {
+      console.warn('Microphone permission denied or unavailable:', err);
+      setError('Microphone permission is required for voice input.');
       return;
     }
 
@@ -59,7 +70,8 @@ export function useVoiceInput(): VoiceInputResult {
 
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    // Use the browser's native language, falling back to en-US
+    recognition.lang = navigator.language || 'en-US';
 
     recognition.onstart = () => {
       setIsListening(true);
@@ -79,7 +91,7 @@ export function useVoiceInput(): VoiceInputResult {
       }
 
       if (finalTranscript) {
-        setTranscript(prev => prev + finalTranscript);
+        setTranscript(prev => prev + finalTranscript + ' ');
       }
     };
 

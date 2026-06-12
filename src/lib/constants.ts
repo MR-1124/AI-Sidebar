@@ -35,12 +35,11 @@ export const STREAM_PORT_NAME = 'ais-stream';
 
 import type { KeyboardShortcut } from '../types/settings';
 
-/** Default keyboard shortcuts. */
 export const DEFAULT_SHORTCUTS: KeyboardShortcut[] = [
-  { id: 'new-chat', label: 'New Chat', description: 'Start a new conversation', keys: ['Ctrl', 'N'], action: 'newChat', isCustom: false },
-  { id: 'toggle-sidebar', label: 'Toggle Sidebar', description: 'Show/hide chat list', keys: ['Ctrl', 'B'], action: 'toggleSidebar', isCustom: false },
-  { id: 'search', label: 'Search', description: 'Search conversations', keys: ['Ctrl', 'K'], action: 'search', isCustom: false },
-  { id: 'settings', label: 'Settings', description: 'Open settings', keys: ['Ctrl', ','], action: 'openSettings', isCustom: false },
-  { id: 'focus-input', label: 'Focus Input', description: 'Focus the message input', keys: ['Ctrl', 'L'], action: 'focusInput', isCustom: false },
+  { id: 'new-chat', label: 'New Chat', description: 'Start a new conversation', keys: ['Alt', 'N'], action: 'newChat', isCustom: false },
+  { id: 'toggle-sidebar', label: 'Toggle Sidebar', description: 'Show/hide chat list', keys: ['Alt', 'B'], action: 'toggleSidebar', isCustom: false },
+  { id: 'search', label: 'Search', description: 'Search conversations', keys: ['Alt', 'K'], action: 'search', isCustom: false },
+  { id: 'settings', label: 'Settings', description: 'Open settings', keys: ['Alt', ','], action: 'openSettings', isCustom: false },
+  { id: 'focus-input', label: 'Focus Input', description: 'Focus the message input', keys: ['Alt', 'L'], action: 'focusInput', isCustom: false },
   { id: 'stop-generation', label: 'Stop Generation', description: 'Stop the current response', keys: ['Escape'], action: 'stopGeneration', isCustom: false },
 ];
