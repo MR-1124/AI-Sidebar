@@ -515,11 +515,18 @@ export async function executeBrowserAction(payload: BrowserActionPayload): Promi
       return { success: false, message: 'observe: DOM extraction failed.' };
     }
 
-    const results = await chrome.scripting.executeScript({
+    // Execute the script with a global safety timeout to prevent hanging the orchestrator
+    const executePromise = chrome.scripting.executeScript({
       target: { tabId: tab.id },
       func: injectedDomActor,
       args: [payload],
     });
+
+    const timeoutPromise = new Promise<any>((_, reject) => {
+      setTimeout(() => reject(new Error('DOM Actor execution timed out after 20 seconds')), 20000);
+    });
+
+    const results = await Promise.race([executePromise, timeoutPromise]) as chrome.scripting.InjectionResult[];
 
     if (results && results[0] && results[0].result) {
       return results[0].result as BrowserActionResult;

@@ -384,6 +384,17 @@ export function useChat() {
         port.onDisconnect.addListener(() => {
           portRef.current = null;
           if (useUIStore.getState().isGenerating) {
+            // Abrupt disconnect (e.g. extension reload or worker crash)
+            buffer.flush();
+            updateMessage(assistantMsgId, {
+              isStreaming: false,
+              isError: true,
+              errorMessage: 'Connection to background service worker lost.',
+              content: buffer.getContent(assistantMsgId)
+                || useChatStore.getState().messages.find(m => m.id === assistantMsgId)?.content
+                || '',
+            });
+            buffer.clear(assistantMsgId);
             setGenerating(false);
           }
         });

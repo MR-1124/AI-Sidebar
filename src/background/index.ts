@@ -5,6 +5,10 @@
 import { handleMessage } from './message-handler';
 import { handleChatStream, cancelStream } from './stream-manager';
 import { STREAM_PORT_NAME } from '../lib/constants';
+import { startStorageMonitor } from '../db/cleanup';
+
+// Start storage quota monitor
+startStorageMonitor();
 
 // ── Side Panel Setup ──────────────────────────────────────
 chrome.sidePanel

@@ -37,12 +37,8 @@ function base64ToArrayBuffer(base64: string): ArrayBuffer {
 
 /**
  * Get or generate per-installation key material.
- * On first call (after install), generates a 32-byte random secret
- * and persists it to chrome.storage.local. On subsequent calls,
- * retrieves the stored secret. The result is combined with
- * chrome.runtime.id as an additional pepper.
  */
-async function getKeyMaterial(): Promise<Uint8Array> {
+async function getKeyMaterial(useRuntimeId: boolean = false): Promise<Uint8Array> {
   const result = await chrome.storage.local.get(INSTALL_SECRET_KEY);
   let secretBase64 = result[INSTALL_SECRET_KEY] as string | undefined;
 
@@ -53,14 +49,14 @@ async function getKeyMaterial(): Promise<Uint8Array> {
     await chrome.storage.local.set({ [INSTALL_SECRET_KEY]: secretBase64 });
   }
 
-  // Combine with chrome.runtime.id as a pepper
-  const extensionId = chrome.runtime?.id || 'aiside-fallback';
-  const combined = secretBase64 + ':' + extensionId;
+  // Use a stable pepper for unpacked dev extensions, but allow checking the old runtime ID
+  const pepper = useRuntimeId ? (chrome.runtime?.id || 'aiside-fallback') : 'aiside-stable-pepper-v2';
+  const combined = secretBase64 + ':' + pepper;
   return new TextEncoder().encode(combined);
 }
 
-async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
-  const rawKeyMaterial = await getKeyMaterial();
+async function deriveKey(salt: Uint8Array, useRuntimeId: boolean = false): Promise<CryptoKey> {
+  const rawKeyMaterial = await getKeyMaterial(useRuntimeId);
 
   const keyMaterial = await crypto.subtle.importKey(
     'raw',
@@ -91,7 +87,7 @@ async function deriveKey(salt: Uint8Array): Promise<CryptoKey> {
 export async function encryptApiKey(plaintext: string): Promise<EncryptedData> {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
-  const key = await deriveKey(salt);
+  const key = await deriveKey(salt, false); // Always encrypt with stable pepper now
 
   const ciphertext = await crypto.subtle.encrypt(
     { name: 'AES-GCM', iv: iv as any },
@@ -113,13 +109,24 @@ export async function decryptApiKey(encrypted: EncryptedData): Promise<string> {
   const salt = new Uint8Array(base64ToArrayBuffer(encrypted.salt));
   const iv = new Uint8Array(base64ToArrayBuffer(encrypted.iv));
   const ciphertext = base64ToArrayBuffer(encrypted.ciphertext);
-  const key = await deriveKey(salt);
 
-  const plaintext = await crypto.subtle.decrypt(
-    { name: 'AES-GCM', iv: iv as any },
-    key,
-    ciphertext
-  );
-
-  return new TextDecoder().decode(plaintext);
+  try {
+    // Try stable pepper first (new default)
+    const key = await deriveKey(salt, false);
+    const plaintext = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv as any },
+      key,
+      ciphertext
+    );
+    return new TextDecoder().decode(plaintext);
+  } catch (err) {
+    // Fallback to legacy runtime ID pepper for existing keys
+    const legacyKey = await deriveKey(salt, true);
+    const plaintext = await crypto.subtle.decrypt(
+      { name: 'AES-GCM', iv: iv as any },
+      legacyKey,
+      ciphertext
+    );
+    return new TextDecoder().decode(plaintext);
+  }
 }

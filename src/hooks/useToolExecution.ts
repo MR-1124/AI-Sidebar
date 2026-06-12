@@ -31,7 +31,13 @@ export async function executeToolCall(
       const args = JSON.parse(fn.arguments);
       let result;
       if (settings.tools.searchEngine === 'tavily' && settings.tools.tavilyApiKey) {
-        result = await performTavilySearch(args.query, settings.tools.tavilyApiKey);
+        try {
+          result = await performTavilySearch(args.query, settings.tools.tavilyApiKey);
+        } catch (tavilyError: any) {
+          console.warn('Tavily search failed, falling back to DuckDuckGo:', tavilyError);
+          // Fallback to DuckDuckGo if Tavily hits an error (e.g., rate limit or out of credits)
+          result = await performDuckDuckGoSearch(args.query);
+        }
       } else {
         result = await performDuckDuckGoSearch(args.query);
       }

@@ -44,13 +44,40 @@ export function trimMessagesToFit(
   const availableForConversation = budget - systemTokens;
 
   if (availableForConversation <= 0) {
-    // System prompt alone exceeds budget — just return it truncated
-    return systemMessages;
+    // System prompt alone exceeds budget — we MUST truncate the system prompt string
+    // to prevent API failures.
+    const ratio = budget / systemTokens;
+    return systemMessages.map(msg => {
+      if (typeof msg.content === 'string') {
+        const limit = Math.max(10, Math.floor(msg.content.length * ratio));
+        return { ...msg, content: msg.content.substring(0, limit) + '...[System Prompt Truncated]...' };
+      }
+      return msg;
+    });
   }
 
   // Keep the first user message for context
-  const firstUserMsg = conversationMessages[0];
-  const firstUserTokens = estimateMessagesTokenCount([firstUserMsg]);
+  let firstUserMsg = { ...conversationMessages[0] };
+  let firstUserTokens = estimateMessagesTokenCount([firstUserMsg]);
+
+  // If the first message ALONE exceeds the available tokens, truncate its text
+  if (firstUserTokens > availableForConversation) {
+    const ratio = availableForConversation / firstUserTokens;
+    if (typeof firstUserMsg.content === 'string') {
+      const limit = Math.floor(firstUserMsg.content.length * ratio);
+      firstUserMsg.content = firstUserMsg.content.substring(0, limit) + '\n\n...[Content truncated to fit context window]...';
+    } else if (Array.isArray(firstUserMsg.content)) {
+      firstUserMsg.content = firstUserMsg.content.map((part: any) => {
+        if (part.type === 'text' && typeof part.text === 'string') {
+          const limit = Math.floor(part.text.length * ratio);
+          return { ...part, text: part.text.substring(0, limit) + '\n\n...[Content truncated]...' };
+        }
+        return part;
+      });
+    }
+    // Return immediately since budget is consumed
+    return [...systemMessages, firstUserMsg];
+  }
 
   // Build from the end (most recent messages first)
   const result: ApiMessage[] = [];

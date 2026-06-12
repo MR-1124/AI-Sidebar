@@ -69,70 +69,108 @@ export async function handleChatStream(
   const controller = new AbortController();
   activeStreams.set(requestId, controller);
 
-  try {
-    const stream = provider.createChatCompletion(apiKey, request, customBaseUrl, controller.signal);
+  const delay = (ms: number) => new Promise(res => setTimeout(res, ms));
+  const maxRetries = 2;
+  let attempt = 0;
 
-    for await (const event of stream) {
-      // Check if cancelled
-      if (controller.signal.aborted) {
-        port.postMessage({
-          type: 'CHAT_STREAM_END',
-          payload: { requestId, content: '', finishReason: 'stop' },
-        });
-        return;
-      }
+  while (attempt <= maxRetries) {
+    try {
+      const stream = provider.createChatCompletion(apiKey, request, customBaseUrl, controller.signal);
 
-      switch (event.type) {
-        case 'chunk':
-          port.postMessage({
-            type: 'CHAT_STREAM_CHUNK',
-            payload: { 
-              requestId, 
-              content: event.content,
-              reasoningContent: event.reasoningContent,
-              fullReasoningContent: event.fullReasoningContent
-            },
-          });
-          break;
-
-        case 'end':
+      for await (const event of stream) {
+        if (controller.signal.aborted) {
           port.postMessage({
             type: 'CHAT_STREAM_END',
-            payload: {
-              requestId,
-              content: event.content,
-              finishReason: event.finishReason,
-              toolCalls: event.toolCalls,
-              usage: event.usage,
-            },
+            payload: { requestId, content: '', finishReason: 'stop' },
           });
           return;
+        }
 
-        case 'error':
-          port.postMessage({
-            type: 'CHAT_STREAM_ERROR',
-            payload: {
-              requestId,
-              error: event.error,
-              code: event.code,
-            },
-          });
-          return;
+        switch (event.type) {
+          case 'chunk':
+            port.postMessage({
+              type: 'CHAT_STREAM_CHUNK',
+              payload: { 
+                requestId, 
+                content: event.content,
+                reasoningContent: event.reasoningContent,
+                fullReasoningContent: event.fullReasoningContent
+              },
+            });
+            break;
+
+          case 'end':
+            port.postMessage({
+              type: 'CHAT_STREAM_END',
+              payload: {
+                requestId,
+                content: event.content,
+                finishReason: event.finishReason,
+                toolCalls: event.toolCalls,
+                usage: event.usage,
+              },
+            });
+            return;
+
+          case 'error': {
+            const errMsg = (event.error || '').toLowerCase();
+            const isRetryable = errMsg.includes('429') || errMsg.includes('rate limit') || errMsg.includes('50') || errMsg.includes('fetch failed') || errMsg.includes('timeout');
+            
+            if (isRetryable && attempt < maxRetries) {
+              throw new Error(`RETRY_TRIGGER: ${event.error}`);
+            }
+
+            port.postMessage({
+              type: 'CHAT_STREAM_ERROR',
+              payload: {
+                requestId,
+                error: `API Error: ${event.error}`,
+                code: event.code,
+              },
+            });
+            return;
+          }
+        }
       }
-    }
-  } catch (error) {
-    if (!controller.signal.aborted) {
+      
+      // Successfully finished stream loop without throwing, break out of retry loop
+      break;
+
+    } catch (error) {
+      if (controller.signal.aborted) return;
+      
+      const errMsg = error instanceof Error ? error.message : String(error);
+      const lowerErr = errMsg.toLowerCase();
+      const isRetryable = errMsg.startsWith('RETRY_TRIGGER:') || lowerErr.includes('429') || lowerErr.includes('rate limit') || lowerErr.includes('fetch failed') || lowerErr.includes('timeout') || lowerErr.includes('50');
+
+      if (isRetryable && attempt < maxRetries) {
+        attempt++;
+        // Send a temporary error chunk to notify user of retry
+        port.postMessage({
+          type: 'CHAT_STREAM_CHUNK',
+          payload: { 
+            requestId, 
+            content: `\n\n*[Connection failed. Retrying... (Attempt ${attempt}/${maxRetries})]*\n\n`
+          },
+        });
+        
+        await delay(1500 * attempt); // Backoff: 1.5s, 3.0s
+        continue;
+      }
+
+      // If we run out of retries or it's a non-retryable error (like 401 Unauthorized or 400 Bad Request)
       port.postMessage({
         type: 'CHAT_STREAM_ERROR',
         payload: {
           requestId,
-          error: error instanceof Error ? error.message : 'Stream error',
+          error: errMsg.replace('RETRY_TRIGGER: ', '') + (attempt > 0 ? ` (Failed after ${attempt} retries)` : ''),
         },
       });
+      break;
     }
-  } finally {
-    activeStreams.delete(requestId);
   }
+
+  activeStreams.delete(requestId);
 }
 
 /**
