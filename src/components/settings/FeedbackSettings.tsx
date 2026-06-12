@@ -2,9 +2,8 @@ import React from 'react';
 import { Widget } from '@typeform/embed-react';
 
 export function FeedbackSettings() {
-  // We use a placeholder Typeform ID here. 
-  // In a real application, you would load this from an environment variable or settings.
-  const typeformId = 'c7a4m0W5'; // Example Typeform ID
+  // Use the actual Typeform ID provided by the user
+  const typeformId = 'YV0TyKFO';
 
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-300">
