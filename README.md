@@ -2,10 +2,9 @@
   <img src="public/icons/icon-128.png" alt="AI Sidebar Logo" width="128" height="128" />
   
   <h1>AI Sidebar Extension</h1>
-  <p><strong>Your Intelligent Browsing Companion</strong></p>
+  <p><strong>Your personal, intelligent browsing sidekick 🚀</strong></p>
 
   <p>
-    <!-- Placeholder for badges: e.g., build status, version, license -->
     <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Version" />
     <img src="https://img.shields.io/badge/license-MIT-green.svg" alt="License" />
     <img src="https://img.shields.io/badge/react-18.x-61dafb.svg" alt="React" />
@@ -15,38 +14,38 @@
 
 <br />
 
-AI Sidebar is a powerful, secure, and performant Chrome extension that integrates advanced LLMs directly into your browser's side panel. It acts as an intelligent agent that can read page context, execute multi-step web searches, interact with DOM elements, and assist you with complex tasks while browsing.
+Hey there! 👋 Welcome to **AI Sidebar** — a Chrome extension we built to bring the power of advanced LLMs directly into your browser. Instead of switching tabs to talk to ChatGPT or Claude, AI Sidebar sits right next to whatever you're working on. It's designed to be smart, extremely fast, and fiercely protective of your privacy. 
+
+It's not just a chat box, though! It acts as a real agent: it can read the page you're on, browse the web to find answers, and even click and type on web pages for you.
 
 ---
 
-## 📸 Screenshots
-
-<!-- NOTE: Replace the paths below with actual screenshot images once captured -->
+## 📸 See it in action
 
 <div align="center">
   <table width="100%">
     <tr>
       <td width="50%" align="center">
         <b>Chat Interface</b><br/>
-        <img src="docs/screenshots/chat-interface.png" alt="Chat Interface Screenshot Placeholder" width="400"/>
-        <br/><i>The main conversational interface with streaming responses.</i>
+        <img src="https://i.ibb.co/21nq1HW5/Screenshot-2026-06-12-095632.png" alt="Chat Interface" width="400"/>
+        <br/><i>Fast, clean conversations with real-time streaming.</i>
       </td>
       <td width="50%" align="center">
         <b>Settings & Models</b><br/>
-        <img src="docs/screenshots/settings.png" alt="Settings Screenshot Placeholder" width="400"/>
-        <br/><i>Configure multiple providers, models, and API keys securely.</i>
+        <img src="https://i.ibb.co/23KKxr4x/image.png" alt="Settings" width="400"/>
+        <br/><i>Easily swap between your favorite models and secure your API keys.</i>
       </td>
     </tr>
     <tr>
       <td width="50%" align="center">
         <b>Agentic DOM Interaction</b><br/>
-        <img src="docs/screenshots/dom-interaction.png" alt="DOM Interaction Screenshot Placeholder" width="400"/>
-        <br/><i>The AI analyzing and interacting with the current web page.</i>
+        <img src="https://i.ibb.co/jPQxtx30/image.png" alt="DOM Interaction" width="400"/>
+        <br/><i>The AI "sees" your page and can interact with it for you.</i>
       </td>
       <td width="50%" align="center">
-        <b>Voice Input & Accessibility</b><br/>
-        <img src="docs/screenshots/voice-input.png" alt="Voice Input Screenshot Placeholder" width="400"/>
-        <br/><i>Built-in Speech-to-Text for hands-free interactions.</i>
+        <b>Voice Input</b><br/>
+        <img src="https://i.ibb.co/whYBLFGf/image.png" alt="Voice Input" width="400"/>
+        <br/><i>Just talk to it! Built-in dictation makes things hands-free.</i>
       </td>
     </tr>
   </table>
@@ -54,105 +53,95 @@ AI Sidebar is a powerful, secure, and performant Chrome extension that integrate
 
 ---
 
-## ✨ Features
+## ✨ What makes it special?
 
-- **🧠 Multi-Model Support:** Connect seamlessly to OpenAI, Anthropic, Gemini, Cohere, Groq, Ollama, LMStudio, and OpenRouter.
-- **🛡️ Uncompromising Security:** All API keys are encrypted at-rest using AES-GCM (Web Crypto API) with per-installation key material. The extension implements strict context sanitization and custom permission modals to prevent unauthorized actions.
-- **⚡ High Performance:** Designed to handle massive context windows and long-running streaming text efficiently. Built with a custom `StreamingBuffer` to optimize React renders and split-chunk caching.
-- **🕵️ Agentic Capabilities:** Powered by an intelligent orchestrator, the AI can recursively call tools. It can search the web (via Tavily/DuckDuckGo) and execute DOM actions like `navigate`, `click`, `fill_form`, and `wait_for_selector`.
-- **📂 Conversation Management:** Complete local-first conversation tracking (IndexedDB), message branching (regenerate without losing history), and robust import/export compatibility (supports native, markdown, and ChatGPT JSON formats).
-- **🎙️ Voice Input:** Integrated Web Speech API for seamless voice-to-text dictation.
+- **🧠 Bring Your Own Model:** Whether you love OpenAI, Anthropic, Gemini, Groq, or even local models via Ollama/LMStudio, we've got you covered. You can even mix and match using OpenRouter!
+- **🛡️ Truly Private & Secure:** We believe your keys belong to you. All API keys are encrypted at rest using AES-GCM right in your browser. We never track you, and your chat history lives strictly in your local IndexedDB.
+- **⚡ Built for Speed:** We engineered a custom `StreamingBuffer` that keeps the UI buttery smooth, even when the AI is dumping thousands of words at once. 
+- **🕵️ Real Agentic Powers:** It doesn't just talk; it does things. Tell it to "search the web for X", or "click the login button", and it will autonomously use tools to get it done.
+- **📂 Easy Chat Management:** Branch your conversations, easily pick up where you left off, and export your chats whenever you need them.
+- **🎙️ Voice Ready:** Tap the mic and just start speaking. It's that easy.
 
 ---
 
-## 🛠️ Local Development Setup
+## 🛠️ Want to tinker with the code?
 
-Follow these instructions to build and run the AI Sidebar locally.
+If you're a developer and want to run this locally or contribute, here's how to get started:
 
-### Prerequisites
+### What you'll need
+- **Node.js** (v18 or newer)
+- **npm**, **yarn**, or **pnpm**
+- A Chromium browser (Chrome, Edge, Brave, etc.)
 
-- **Node.js** (v18 or higher recommended)
-- **npm** or **yarn** or **pnpm**
-- Chromium-based browser (Chrome, Edge, Brave, etc.)
+### Getting it running
 
-### Installation
-
-1. **Clone the repository:**
+1. **Grab the code:**
    ```bash
    git clone https://github.com/MR-1124/AI-Sidebar.git
    cd AI-Sidebar
    ```
 
-2. **Install dependencies:**
+2. **Install the packages:**
    ```bash
    npm install
    ```
 
-3. **Start the development server:**
+3. **Fire up the dev server:**
    ```bash
    npm run dev
    ```
-   *Vite will start the dev server and handle Hot Module Replacement (HMR).*
+   *Vite will take care of hot-reloading as you make changes!*
 
-### Loading the Extension in Chrome
+### Loading it into Chrome
 
-1. Open your Chromium-based browser and navigate to `chrome://extensions/`.
-2. Enable **"Developer mode"** (toggle in the top right corner).
-3. Click **"Load unpacked"**.
-4. Select the `dist/` folder generated in the `AI-Sidebar` repository (you may need to run `npm run build` first if Vite dev hasn't fully hydrated it, though `@crxjs/vite-plugin` usually handles dev builds well).
-5. Pin the extension to your toolbar and click the icon to open the Sidebar!
+1. Go to `chrome://extensions/` in your browser.
+2. Toggle on **"Developer mode"** in the top right.
+3. Click **"Load unpacked"** and select the `dist/` folder inside the project.
+4. Pin it to your toolbar and click the icon to open the sidebar. You're good to go!
 
 ---
 
-## 🧪 Testing
+## 🧪 Running Tests
 
-The repository uses `Vitest` for lightning-fast unit and integration testing.
+We use `Vitest` to make sure things don't break. You can run the test suite easily:
 
 ```bash
-# Run all tests
+# Run everything once
 npm run test
 
-# Run tests in watch mode
+# Run in watch mode while coding
 npm run test:watch
 ```
 
 ---
 
-## 🏗️ Architecture Stack
+## 🏗️ Under the Hood
 
+Curious about the tech stack? Here's what we're running:
 - **Framework:** [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - **Bundler:** [Vite](https://vitejs.dev/) + [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
 - **State Management:** [Zustand](https://docs.pmnd.rs/zustand/getting-started/introduction)
-- **Database:** Local `IndexedDB` (via [idb](https://github.com/jakearchibald/idb)) & `chrome.storage.local`
-- **Testing:** [Vitest](https://vitest.dev/)
+- **Database:** Local `IndexedDB` & `chrome.storage.local`
 
 ---
 
-## 🔒 Privacy & Security Note
+## 🐛 Known Issues & What's Next
 
-AI Sidebar is designed with a **Local-First** philosophy. 
-- All your API keys are stored locally on your machine and encrypted.
-- Your conversation history is saved exclusively to your local browser storage (IndexedDB).
-- We do not run external tracking, analytics servers, or telemetry beyond basic local logging.
+> [!WARNING]  
+> We're building and shipping fast! Because of this, you might occasionally run into a bug, especially with the AI trying to click complex web elements or handling weird provider rate limits. We're actively improving it every day. If something breaks, please let us know!
 
-## 🐛 Known Issues & Roadmap
+## 🤝 Let's build this together!
 
-> [!WARNING]
-> This extension is actively under development! There may be some occasional bugs, particularly with edge cases in DOM interactions or provider-specific rate limits. We are continuously improving the extension, adding features, and fixing bugs along the way. Feel free to report issues or suggest improvements!
-
-## 🤝 Contributing
-
-Contributions are welcome! Please open an issue first to discuss what you would like to change before submitting a Pull Request.
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+We would absolutely love your help. If you have an idea, find a bug, or want to add a feature:
+1. Open an issue so we can chat about it.
+2. Fork the repo and make your branch (`git checkout -b feature/MyCoolIdea`).
+3. Commit your tweaks (`git commit -m 'Added this cool thing'`).
+4. Push it up (`git push origin feature/MyCoolIdea`).
+5. Open a Pull Request!
 
 ---
 
 <div align="center">
-  <i>Built with ❤️ for power users and AI enthusiasts.</i>
+  <i>Built with ❤️ for power users, tinkerers, and AI enthusiasts.</i>
 </div>
