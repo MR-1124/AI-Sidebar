@@ -28,24 +28,24 @@ AI Sidebar is a powerful, secure, and performant Chrome extension that integrate
     <tr>
       <td width="50%" align="center">
         <b>Chat Interface</b><br/>
-        <img src="docs/screenshots/chat-interface.png" alt="Chat Interface Screenshot Placeholder" width="400"/>
+        <img src="https://i.ibb.co/21nq1HW5/Screenshot-2026-06-12-095632.png" alt="Chat Interface Screenshot Placeholder" width="400"/>
         <br/><i>The main conversational interface with streaming responses.</i>
       </td>
       <td width="50%" align="center">
         <b>Settings & Models</b><br/>
-        <img src="docs/screenshots/settings.png" alt="Settings Screenshot Placeholder" width="400"/>
+        <img src="https://i.ibb.co/23KKxr4x/image.png" alt="Settings Screenshot Placeholder" width="400"/>
         <br/><i>Configure multiple providers, models, and API keys securely.</i>
       </td>
     </tr>
     <tr>
       <td width="50%" align="center">
         <b>Agentic DOM Interaction</b><br/>
-        <img src="docs/screenshots/dom-interaction.png" alt="DOM Interaction Screenshot Placeholder" width="400"/>
+        <img src="https://i.ibb.co/jPQxtx30/image.png" alt="DOM Interaction Screenshot Placeholder" width="400"/>
         <br/><i>The AI analyzing and interacting with the current web page.</i>
       </td>
       <td width="50%" align="center">
         <b>Voice Input & Accessibility</b><br/>
-        <img src="docs/screenshots/voice-input.png" alt="Voice Input Screenshot Placeholder" width="400"/>
+        <img src="https://i.ibb.co/whYBLFGf/image.png" alt="Voice Input Screenshot Placeholder" width="400"/>
         <br/><i>Built-in Speech-to-Text for hands-free interactions.</i>
       </td>
     </tr>
