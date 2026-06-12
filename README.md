@@ -27,7 +27,6 @@ It's not just a chat box, though! It acts as a real agent: it can read the page 
     <tr>
       <td width="50%" align="center">
         <b>Chat Interface</b><br/>
-<<<<<<< HEAD
         <img src="https://i.ibb.co/21nq1HW5/Screenshot-2026-06-12-095632.png" alt="Chat Interface" width="400"/>
         <br/><i>Fast, clean conversations with real-time streaming.</i>
       </td>
@@ -35,21 +34,11 @@ It's not just a chat box, though! It acts as a real agent: it can read the page 
         <b>Settings & Models</b><br/>
         <img src="https://i.ibb.co/23KKxr4x/image.png" alt="Settings" width="400"/>
         <br/><i>Easily swap between your favorite models and secure your API keys.</i>
-=======
-        <img src="https://i.ibb.co/21nq1HW5/Screenshot-2026-06-12-095632.png" alt="Chat Interface Screenshot Placeholder" width="400"/>
-        <br/><i>The main conversational interface with streaming responses.</i>
-      </td>
-      <td width="50%" align="center">
-        <b>Settings & Models</b><br/>
-        <img src="https://i.ibb.co/23KKxr4x/image.png" alt="Settings Screenshot Placeholder" width="400"/>
-        <br/><i>Configure multiple providers, models, and API keys securely.</i>
->>>>>>> 52cd1617e5802634eea3ce9b424c1e398a714452
       </td>
     </tr>
     <tr>
       <td width="50%" align="center">
         <b>Agentic DOM Interaction</b><br/>
-<<<<<<< HEAD
         <img src="https://i.ibb.co/jPQxtx30/image.png" alt="DOM Interaction" width="400"/>
         <br/><i>The AI "sees" your page and can interact with it for you.</i>
       </td>
@@ -57,15 +46,6 @@ It's not just a chat box, though! It acts as a real agent: it can read the page 
         <b>Voice Input</b><br/>
         <img src="https://i.ibb.co/whYBLFGf/image.png" alt="Voice Input" width="400"/>
         <br/><i>Just talk to it! Built-in dictation makes things hands-free.</i>
-=======
-        <img src="https://i.ibb.co/jPQxtx30/image.png" alt="DOM Interaction Screenshot Placeholder" width="400"/>
-        <br/><i>The AI analyzing and interacting with the current web page.</i>
-      </td>
-      <td width="50%" align="center">
-        <b>Voice Input & Accessibility</b><br/>
-        <img src="https://i.ibb.co/whYBLFGf/image.png" alt="Voice Input Screenshot Placeholder" width="400"/>
-        <br/><i>Built-in Speech-to-Text for hands-free interactions.</i>
->>>>>>> 52cd1617e5802634eea3ce9b424c1e398a714452
       </td>
     </tr>
   </table>
