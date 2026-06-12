@@ -2,8 +2,8 @@
 // AnalyticsPage — Usage statistics and cost estimates
 // ─────────────────────────────────────────────────────────────
 
-import React, { useEffect, useMemo } from 'react';
-import { X, DollarSign, Zap, MessageSquare, BarChart2 } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { X, DollarSign, Zap, MessageSquare, BarChart2, Download, Trash2, Calendar } from 'lucide-react';
 import { useUIStore } from '../../stores/ui-store';
 import { useUsageStore } from '../../stores/usage-store';
 import { formatCost, formatTokenCount } from '../../lib/utils';
@@ -16,55 +16,97 @@ const COLORS = ['#3b82f6', '#10b981', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4'
 
 export function AnalyticsPage() {
   const { setView } = useUIStore();
-  const { totalCost, totalTokens, records, loadUsageSummary } = useUsageStore();
+  const { totalCost, totalTokens, records, loadUsageSummary, clearUsage } = useUsageStore();
+  const [dateRange, setDateRange] = useState<'7days' | '30days' | 'all'>('all');
 
   useEffect(() => {
     loadUsageSummary();
   }, [loadUsageSummary]);
 
+  const filteredRecords = useMemo(() => {
+    if (dateRange === 'all') return records;
+    const now = Date.now();
+    const msInDay = 1000 * 60 * 60 * 24;
+    const limit = dateRange === '7days' ? 7 * msInDay : 30 * msInDay;
+    return records.filter(r => now - r.createdAt <= limit);
+  }, [records, dateRange]);
+
   // Aggregate daily data
   const dailyData = useMemo(() => {
     const map: Record<string, any> = {};
-    records.forEach(r => {
+    filteredRecords.forEach(r => {
       const d = new Date(r.createdAt);
       const dateStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
       if (!map[dateStr]) {
         map[dateStr] = { date: dateStr, cost: 0, tokens: 0, messages: 0 };
       }
-      map[dateStr].cost += r.estimatedCost;
-      map[dateStr].tokens += r.totalTokens;
+      map[dateStr].cost += r.estimatedCost || 0;
+      map[dateStr].tokens += r.totalTokens || 0;
       map[dateStr].messages += 1;
     });
     return Object.values(map).sort((a: any, b: any) => a.date.localeCompare(b.date));
-  }, [records]);
+  }, [filteredRecords]);
 
   // Aggregate model data
   const modelData = useMemo(() => {
     const map: Record<string, any> = {};
-    records.forEach(r => {
+    filteredRecords.forEach(r => {
       if (!map[r.modelId]) {
         map[r.modelId] = { name: r.modelId, cost: 0, tokens: 0 };
       }
-      map[r.modelId].cost += r.estimatedCost;
-      map[r.modelId].tokens += r.totalTokens;
+      map[r.modelId].cost += r.estimatedCost || 0;
+      map[r.modelId].tokens += r.totalTokens || 0;
     });
     return Object.values(map).sort((a: any, b: any) => b.cost - a.cost);
-  }, [records]);
+  }, [filteredRecords]);
 
   // Provider Data
   const providerData = useMemo(() => {
     const map: Record<string, any> = {};
-    records.forEach(r => {
+    filteredRecords.forEach(r => {
       if (!map[r.providerId]) {
         map[r.providerId] = { name: r.providerId, cost: 0 };
       }
-      map[r.providerId].cost += r.estimatedCost;
+      map[r.providerId].cost += r.estimatedCost || 0;
     });
     return Object.values(map).sort((a: any, b: any) => b.cost - a.cost);
-  }, [records]);
+  }, [filteredRecords]);
 
-  const totalMessages = records.length;
-  const avgCostPerMsg = totalMessages > 0 ? totalCost / totalMessages : 0;
+  const filteredTotalMessages = filteredRecords.length;
+  const filteredTotalCost = filteredRecords.reduce((sum, r) => sum + (r.estimatedCost || 0), 0);
+  const filteredTotalTokens = filteredRecords.reduce((sum, r) => sum + (r.totalTokens || 0), 0);
+  const avgCostPerMsg = filteredTotalMessages > 0 ? filteredTotalCost / filteredTotalMessages : 0;
+
+  const exportCSV = () => {
+    const headers = ['Date', 'Provider', 'Model', 'Prompt Tokens', 'Completion Tokens', 'Total Tokens', 'Estimated Cost', 'Latency (ms)'];
+    const rows = filteredRecords.map(r => [
+      new Date(r.createdAt).toISOString(),
+      r.providerId,
+      r.modelId,
+      r.promptTokens,
+      r.completionTokens,
+      r.totalTokens,
+      (r.estimatedCost || 0).toFixed(6),
+      r.latencyMs || 0
+    ]);
+    
+    const csvContent = "data:text/csv;charset=utf-8," 
+      + [headers.join(','), ...rows.map(e => e.join(','))].join("\n");
+      
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "aiside-analytics.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const handleClearHistory = async () => {
+    if (confirm('Are you sure you want to delete all analytics and usage history? This cannot be undone.')) {
+      await clearUsage();
+    }
+  };
 
   return (
     <div style={{
@@ -115,9 +157,88 @@ export function AnalyticsPage() {
       <div style={{ flex: 1, overflowY: 'auto', padding: '32px 48px' }}>
         <div style={{ maxWidth: 1200, margin: '0 auto' }}>
           
-          <div style={{ marginBottom: 32 }}>
-            <h2 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: 8 }}>Overview</h2>
-            <p style={{ color: 'var(--text-muted)' }}>Estimated API costs and token usage across all providers.</p>
+          <div style={{ marginBottom: 32, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <div>
+              <h2 style={{ fontSize: '1.4rem', fontWeight: 600, marginBottom: 8 }}>Overview</h2>
+              <p style={{ color: 'var(--text-muted)' }}>Estimated API costs and token usage across all providers.</p>
+            </div>
+            
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{
+                display: 'flex',
+                background: 'var(--bg-tertiary)',
+                borderRadius: 'var(--radius-md)',
+                padding: 4,
+                border: '1px solid var(--border)',
+              }}>
+                {(['7days', '30days', 'all'] as const).map(range => (
+                  <button
+                    key={range}
+                    onClick={() => setDateRange(range)}
+                    style={{
+                      padding: '6px 12px',
+                      background: dateRange === range ? 'var(--bg-elevated)' : 'transparent',
+                      border: 'none',
+                      borderRadius: 'var(--radius-sm)',
+                      color: dateRange === range ? 'var(--text-primary)' : 'var(--text-secondary)',
+                      fontSize: '0.85rem',
+                      fontWeight: dateRange === range ? 600 : 400,
+                      boxShadow: dateRange === range ? 'var(--shadow-sm)' : 'none',
+                      cursor: 'pointer',
+                      transition: 'all var(--transition-fast)',
+                    }}
+                  >
+                    {range === '7days' ? '7 Days' : range === '30days' ? '30 Days' : 'All Time'}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={exportCSV}
+                title="Export CSV"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 16px',
+                  background: 'var(--bg-tertiary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--text-primary)',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                  transition: 'all var(--transition-fast)',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--bg-tertiary)'}
+              >
+                <Download size={16} /> Export
+              </button>
+
+              <button
+                onClick={handleClearHistory}
+                title="Clear History"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  padding: '8px 16px',
+                  background: 'var(--error-subtle)',
+                  border: '1px solid transparent',
+                  borderRadius: 'var(--radius-md)',
+                  color: 'var(--error)',
+                  cursor: 'pointer',
+                  fontSize: '0.85rem',
+                  fontWeight: 500,
+                  transition: 'all var(--transition-fast)',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = 'color-mix(in srgb, var(--error) 20%, transparent)'}
+                onMouseLeave={e => e.currentTarget.style.background = 'var(--error-subtle)'}
+              >
+                <Trash2 size={16} /> Clear
+              </button>
+            </div>
           </div>
 
           {/* Stats Grid */}
@@ -130,19 +251,19 @@ export function AnalyticsPage() {
             <StatCard 
               icon={<DollarSign size={20} />} 
               title="Total Estimated Cost" 
-              value={formatCost(totalCost)} 
+              value={formatCost(filteredTotalCost)} 
               color="var(--success)" 
             />
             <StatCard 
               icon={<Zap size={20} />} 
               title="Total Tokens" 
-              value={formatTokenCount(totalTokens)} 
+              value={formatTokenCount(filteredTotalTokens)} 
               color="var(--accent)" 
             />
             <StatCard 
               icon={<MessageSquare size={20} />} 
               title="Total Messages" 
-              value={totalMessages.toLocaleString()} 
+              value={filteredTotalMessages.toLocaleString()} 
               color="#f59e0b" 
             />
             <StatCard 
@@ -300,8 +421,21 @@ function StatCard({ icon, title, value, color }: { icon: React.ReactNode, title:
 
 function EmptyChartMessage() {
   return (
-    <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--text-muted)' }}>
-      No usage data available yet.
+    <div style={{
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+      color: 'var(--text-muted)',
+      background: 'var(--bg-tertiary)',
+      borderRadius: 'var(--radius-md)',
+      border: '1px dashed var(--border)',
+    }}>
+      <BarChart2 size={32} style={{ marginBottom: 12, opacity: 0.5 }} />
+      <span style={{ fontSize: '0.9rem', fontWeight: 500 }}>No usage data available</span>
+      <span style={{ fontSize: '0.8rem', opacity: 0.8, marginTop: 4 }}>Generate some messages to see charts!</span>
     </div>
   );
 }

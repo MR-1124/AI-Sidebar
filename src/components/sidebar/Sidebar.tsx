@@ -8,6 +8,7 @@ import { useUIStore } from '../../stores/ui-store';
 import { useChatStore } from '../../stores/chat-store';
 import { formatRelativeTime } from '../../lib/utils';
 import type { Folder } from '../../types/chat';
+import { FolderEditModal, FolderDeleteModal, MoveChatModal } from '../ui/FolderModals';
 
 export function Sidebar() {
   const { sidebarOpen, setView, toggleSidebar } = useUIStore();
@@ -16,6 +17,12 @@ export function Sidebar() {
   
   // Folder expansion state
   const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
+
+  // Modal states
+  const [isCreatingFolder, setIsCreatingFolder] = useState(false);
+  const [editingFolder, setEditingFolder] = useState<Folder | null>(null);
+  const [deletingFolder, setDeletingFolder] = useState<Folder | null>(null);
+  const [movingChat, setMovingChat] = useState<{ id: string; folderId?: string } | null>(null);
 
   // Auto-load conversations on mount
   useEffect(() => {
@@ -33,11 +40,8 @@ export function Sidebar() {
     selectConversation('');
   };
 
-  const handleNewFolder = async () => {
-    const name = prompt('Folder Name:');
-    if (name && name.trim()) {
-      await createFolder(name.trim());
-    }
+  const handleNewFolder = () => {
+    setIsCreatingFolder(true);
   };
 
   const toggleFolder = (folderId: string, e: React.MouseEvent) => {
@@ -175,10 +179,7 @@ export function Sidebar() {
           <button
             onClick={(e) => {
               e.stopPropagation();
-              const newFolder = prompt('Enter folder ID to move to (or leave blank for root):');
-              if (newFolder !== null) {
-                useChatStore.getState().moveToFolder(conv.id, newFolder.trim() || undefined);
-              }
+              setMovingChat({ id: conv.id, folderId: conv.folderId });
             }}
             title="Move to Folder"
             style={{
@@ -389,29 +390,95 @@ export function Sidebar() {
 
               return (
                 <div key={folder.id} style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <button
-                    onClick={(e) => toggleFolder(folder.id, e)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 8,
-                      padding: '8px',
-                      background: 'transparent',
-                      border: 'none',
-                      borderRadius: 'var(--radius-md)',
-                      cursor: 'pointer',
-                      textAlign: 'left',
-                      color: 'var(--text-secondary)',
-                      width: '100%',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'var(--bg-hover)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
-                  >
-                    {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
-                    <FolderIcon size={14} style={{ color: folder.color || 'inherit' }} />
-                    <span style={{ flex: 1, fontSize: '0.85rem', fontWeight: 500 }}>{folder.name}</span>
-                    <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{fConvs.length}</span>
-                  </button>
+                  <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                    <button
+                      onClick={(e) => toggleFolder(folder.id, e)}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: 8,
+                        padding: '8px',
+                        background: 'transparent',
+                        border: 'none',
+                        borderRadius: 'var(--radius-md)',
+                        cursor: 'pointer',
+                        textAlign: 'left',
+                        color: 'var(--text-secondary)',
+                        width: '100%',
+                      }}
+                      onMouseEnter={e => {
+                        e.currentTarget.style.background = 'var(--bg-hover)';
+                        const actions = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (actions) actions.style.opacity = '1';
+                      }}
+                      onMouseLeave={e => {
+                        e.currentTarget.style.background = 'transparent';
+                        const actions = e.currentTarget.nextElementSibling as HTMLElement;
+                        if (actions) actions.style.opacity = '0';
+                      }}
+                    >
+                      {isExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+                      <FolderIcon size={14} style={{ color: folder.color || 'inherit' }} />
+                      <span style={{ flex: 1, fontSize: '0.85rem', fontWeight: 500 }}>{folder.name}</span>
+                      <span style={{ fontSize: '0.7rem', color: 'var(--text-muted)' }}>{fConvs.length}</span>
+                    </button>
+
+                    {/* Folder Hover Actions */}
+                    <div 
+                      style={{
+                        position: 'absolute',
+                        right: 8,
+                        display: 'flex',
+                        alignItems: 'center',
+                        opacity: 0,
+                        transition: 'opacity var(--transition-fast)',
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.opacity = '1'; }}
+                      onMouseLeave={e => { e.currentTarget.style.opacity = '0'; }}
+                    >
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setEditingFolder(folder);
+                        }}
+                        title="Edit Folder"
+                        style={{
+                          background: 'var(--bg-elevated)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: 4,
+                          color: 'var(--text-secondary)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.color = 'var(--text-primary)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.color = 'var(--text-secondary)'; }}
+                      >
+                        <Settings size={12} />
+                      </button>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setDeletingFolder(folder);
+                        }}
+                        title="Delete Folder"
+                        style={{
+                          background: 'var(--bg-elevated)',
+                          border: '1px solid var(--border)',
+                          borderRadius: 'var(--radius-sm)',
+                          padding: 4,
+                          color: 'var(--error)',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          marginLeft: 4,
+                        }}
+                        onMouseEnter={e => { e.currentTarget.style.background = 'var(--error-subtle)'; }}
+                        onMouseLeave={e => { e.currentTarget.style.background = 'var(--bg-elevated)'; }}
+                      >
+                        <Trash2 size={12} />
+                      </button>
+                    </div>
+                  </div>
 
                   {isExpanded && fConvs.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -504,6 +571,24 @@ export function Sidebar() {
           <Settings size={16} /> Settings
         </button>
       </div>
+
+      {/* Modals */}
+      {isCreatingFolder && (
+        <FolderEditModal onClose={() => setIsCreatingFolder(false)} />
+      )}
+      {editingFolder && (
+        <FolderEditModal folder={editingFolder} onClose={() => setEditingFolder(null)} />
+      )}
+      {deletingFolder && (
+        <FolderDeleteModal folder={deletingFolder} onClose={() => setDeletingFolder(null)} />
+      )}
+      {movingChat && (
+        <MoveChatModal 
+          conversationId={movingChat.id} 
+          currentFolderId={movingChat.folderId} 
+          onClose={() => setMovingChat(null)} 
+        />
+      )}
     </div>
   );
 }

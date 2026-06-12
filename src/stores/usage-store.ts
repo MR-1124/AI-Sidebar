@@ -14,6 +14,7 @@ interface UsageState {
 
   loadUsageSummary: () => Promise<void>;
   recordUsage: (record: Omit<UsageRecord, 'id' | 'createdAt'>) => Promise<void>;
+  clearUsage: () => Promise<void>;
 }
 
 export const useUsageStore = create<UsageState>((set, get) => ({
@@ -41,5 +42,10 @@ export const useUsageStore = create<UsageState>((set, get) => ({
       totalTokens: s.totalTokens + record.totalTokens,
       records: [...s.records, record],
     }));
+  },
+
+  clearUsage: async () => {
+    await usageRepo.clearAll();
+    set({ totalCost: 0, totalTokens: 0, records: [] });
   },
 }));

@@ -67,4 +67,8 @@ export const usageRepo = {
   async count(): Promise<number> {
     return db.usageRecords.count();
   },
+
+  async clearAll(): Promise<void> {
+    await db.usageRecords.clear();
+  },
 };
