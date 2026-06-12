@@ -1,0 +1,69 @@
+{
+  "manifest_version": 3,
+  "name": "Universal AI Sidebar",
+  "version": "0.1.0",
+  "description": "Chat with AI models from multiple providers — OpenAI, Anthropic, Gemini, and more — in a unified browser sidebar.",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "activeTab",
+    "tabs",
+    "scripting",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>",
+    "https://api.openai.com/*",
+    "https://api.anthropic.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "https://openrouter.ai/*",
+    "https://api.deepseek.com/*",
+    "https://api.groq.com/*",
+    "https://integrate.api.nvidia.com/*",
+    "https://api.together.xyz/*",
+    "https://api.mistral.ai/*",
+    "https://api.cohere.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background/index.ts",
+    "type": "module"
+  },
+  "side_panel": {
+    "default_path": "src/sidepanel/index.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/content/focus-tracker.ts"],
+      "all_frames": true
+    }
+  ],
+  "action": {
+    "default_title": "Universal AI Sidebar",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png",
+      "128": "icons/icon-128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none';"
+  },
+  "commands": {
+    "_execute_side_panel": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Space",
+        "mac": "Command+Shift+Space"
+      },
+      "description": "Open Side Panel"
+    }
+  },
+  "minimum_chrome_version": "116"
+}
