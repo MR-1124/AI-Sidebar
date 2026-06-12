@@ -55,12 +55,12 @@ It's not just a chat box, though! It acts as a real agent: it can read the page 
 
 ## ✨ What makes it special?
 
-- **🧠 Bring Your Own Model:** Whether you love OpenAI, Anthropic, Gemini, Groq, or even local models via Ollama/LMStudio, we've got you covered. You can even mix and match using OpenRouter!
-- **🛡️ Truly Private & Secure:** We believe your keys belong to you. All API keys are encrypted at rest using AES-GCM right in your browser. We never track you, and your chat history lives strictly in your local IndexedDB.
-- **⚡ Built for Speed:** We engineered a custom `StreamingBuffer` that keeps the UI buttery smooth, even when the AI is dumping thousands of words at once. 
-- **🕵️ Real Agentic Powers:** It doesn't just talk; it does things. Tell it to "search the web for X", or "click the login button", and it will autonomously use tools to get it done.
+- **🧠 Bring Your Own Model:** Whether you like OpenAI, Anthropic, Gemini, Groq, or even local models via Ollama/LMStudio, i've got you covered. You can even mix and match using OpenRouter!
+- **🛡️ Truly Private & Secure:** All your keys belong to you, All API keys are encrypted at rest using AES-GCM right in your browser. it is never tracked, and your chat history lives strictly in your local IndexedDB.
+- **⚡ Built for Speed:** Created a custom `StreamingBuffer` that keeps the UI buttery smooth, even when the AI is dumping thousands of words at once. 
+- **🕵️ Real Agentic Powers:** It doesn't just talk; it does things. Tell it to "search the web for X", or "click the login button", and it will autonomously use tools to get it done (majority times it works, if it doesnt do report on the feedback form in the settings).
 - **📂 Easy Chat Management:** Branch your conversations, easily pick up where you left off, and export your chats whenever you need them.
-- **🎙️ Voice Ready:** Tap the mic and just start speaking. It's that easy.
+- **🎙️ Voice Ready:** Tap the mic and just start speaking.
 
 ---
 
@@ -115,9 +115,9 @@ npm run test:watch
 
 ---
 
-## 🏗️ Under the Hood
+## 🏗️ What's Under the Hood
 
-Curious about the tech stack? Here's what we're running:
+Here's what we're running:
 - **Framework:** [React 18](https://react.dev/) + [TypeScript](https://www.typescriptlang.org/)
 - **Bundler:** [Vite](https://vitejs.dev/) + [@crxjs/vite-plugin](https://crxjs.dev/vite-plugin)
 - **Styling:** [Tailwind CSS](https://tailwindcss.com/) + [shadcn/ui](https://ui.shadcn.com/)
@@ -129,11 +129,11 @@ Curious about the tech stack? Here's what we're running:
 ## 🐛 Known Issues & What's Next
 
 > [!WARNING]  
-> We're building and shipping fast! Because of this, you might occasionally run into a bug, especially with the AI trying to click complex web elements or handling weird provider rate limits. We're actively improving it every day. If something breaks, please let us know!
+> I'm building and shipping fast! Because of this, you might occasionally run into a bug, especially with the AI trying to click complex web elements or handling weird provider rate limits. I'm actively learning and improving it every day. If something breaks, please do let me know, I'll try my best to fix it!
 
 ## 🤝 Let's build this together!
 
-We would absolutely love your help. If you have an idea, find a bug, or want to add a feature:
+I would absolutely love your help. If you have an idea, find a bug, or want to add a feature:
 1. Open an issue so we can chat about it.
 2. Fork the repo and make your branch (`git checkout -b feature/MyCoolIdea`).
 3. Commit your tweaks (`git commit -m 'Added this cool thing'`).
