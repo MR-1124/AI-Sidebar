@@ -5,7 +5,7 @@
 import { create } from 'zustand';
 
 export type View = 'chat' | 'settings' | 'analytics' | 'onboarding';
-export type SettingsTab = 'general' | 'providers' | 'tools' | 'models' | 'prompts' | 'chat' | 'privacy' | 'export' | 'shortcuts' | 'personas';
+export type SettingsTab = 'general' | 'providers' | 'tools' | 'models' | 'prompts' | 'chat' | 'privacy' | 'export' | 'shortcuts' | 'personas' | 'feedback';
 
 interface UIState {
   // ── Navigation ───────────────────────────────────

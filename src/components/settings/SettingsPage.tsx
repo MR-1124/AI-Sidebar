@@ -15,9 +15,10 @@ import { PrivacySettings } from './PrivacySettings';
 import { ExportSettings } from './ExportSettings';
 import { ShortcutsSettings } from './ShortcutsSettings';
 import { PersonasSettings } from './PersonasSettings';
+import { FeedbackSettings } from './FeedbackSettings';
 import type { ProviderId, ProviderStatus } from '../../types/provider';
 import type { SettingsTab } from '../../stores/ui-store';
-import { Globe, PanelLeftClose, PanelLeft, User, MousePointer2 } from 'lucide-react';
+import { Globe, PanelLeftClose, PanelLeft, User, MousePointer2, MessageSquare } from 'lucide-react';
 
 export function SettingsPage() {
   const { setView, settingsTab, setSettingsTab, settingsSidebarCollapsed, toggleSettingsSidebar } = useUIStore();
@@ -88,6 +89,9 @@ export function SettingsPage() {
           <TabButton id="privacy" icon={<Shield size={16} />} label="Privacy & Security" current={settingsTab} onClick={setSettingsTab} collapsed={settingsSidebarCollapsed} />
           <TabButton id="export" icon={<Download size={16} />} label="Data Export" current={settingsTab} onClick={setSettingsTab} collapsed={settingsSidebarCollapsed} />
           <TabButton id="shortcuts" icon={<Command size={16} />} label="Shortcuts" current={settingsTab} onClick={setSettingsTab} collapsed={settingsSidebarCollapsed} />
+          
+          <div style={{ margin: '8px 0', borderBottom: '1px solid var(--border)' }} />
+          <TabButton id="feedback" icon={<MessageSquare size={16} />} label="Feedback" current={settingsTab} onClick={setSettingsTab} collapsed={settingsSidebarCollapsed} />
 
           <div style={{ flex: 1 }} />
           
@@ -128,6 +132,7 @@ export function SettingsPage() {
             {settingsTab === 'privacy' && <PrivacySettings />}
             {settingsTab === 'export' && <ExportSettings />}
             {settingsTab === 'shortcuts' && <ShortcutsSettings />}
+            {settingsTab === 'feedback' && <FeedbackSettings />}
           </div>
         </div>
       </div>
