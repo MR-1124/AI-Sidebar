@@ -14,7 +14,7 @@
 
 <br />
 
-Hey there! 👋 Welcome to **AI Sidebar** — a Chrome extension we built to bring the power of advanced LLMs directly into your browser. Instead of switching tabs to talk to ChatGPT or Claude, AI Sidebar sits right next to whatever you're working on. It's designed to be smart, extremely fast, and fiercely protective of your privacy. 
+Hey there! 👋 Welcome to **AI Sidebar** — a Chrome extension i built to bring the power of advanced LLMs directly into your browser. Instead of switching tabs to talk to ChatGPT or Claude, AI Sidebar sits right next to whatever you're working on. It's designed to be smart, fast, and protective of your privacy. 
 
 It's not just a chat box, though! It acts as a real agent: it can read the page you're on, browse the web to find answers, and even click and type on web pages for you.
 
