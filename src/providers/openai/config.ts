@@ -38,4 +38,14 @@ export const openaiConfig: OpenAICompatibleConfig = {
     systemPrompt: true,
     maxConcurrent: 0,
   },
+  requestTransform: (body) => {
+    const isReasoning = body.model.startsWith('o1') || body.model.startsWith('o3');
+    if (isReasoning) {
+      // Map system role to developer for o1/o3 models
+      body.messages = body.messages.map((m: any) =>
+        m.role === 'system' ? { ...m, role: 'developer' } : m
+      );
+    }
+    return body;
+  },
 };

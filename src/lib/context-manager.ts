@@ -19,9 +19,11 @@ type ApiMessage = { role: string; content: any };
 export function trimMessagesToFit(
   messages: ApiMessage[],
   maxTokens: number,
-  reserveForOutput: number = 4096
+  reserveForOutput: number = 2048
 ): ApiMessage[] {
-  const budget = maxTokens - reserveForOutput;
+  // Never reserve more than 30% of the context window to guarantee room for the prompt
+  const actualReserve = Math.min(reserveForOutput, Math.floor(maxTokens * 0.3));
+  const budget = Math.max(1024, maxTokens - actualReserve);
   const currentUsage = estimateMessagesTokenCount(messages);
 
   // If we're within budget, return as-is
