@@ -136,6 +136,11 @@ AI Sidebar is designed with a **Local-First** philosophy.
 - Your conversation history is saved exclusively to your local browser storage (IndexedDB).
 - We do not run external tracking, analytics servers, or telemetry beyond basic local logging.
 
+## 🐛 Known Issues & Roadmap
+
+> [!WARNING]
+> This extension is actively under development! There may be some occasional bugs, particularly with edge cases in DOM interactions or provider-specific rate limits. We are continuously improving the extension, adding features, and fixing bugs along the way. Feel free to report issues or suggest improvements!
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please open an issue first to discuss what you would like to change before submitting a Pull Request.

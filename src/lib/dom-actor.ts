@@ -382,16 +382,17 @@ export async function executeBrowserAction(payload: BrowserActionPayload): Promi
       return { success: false, message: 'No active tab found' };
     }
 
-    if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://')) {
-      return { success: false, message: 'Cannot interact with system or extension pages.' };
-    }
-
     if (payload.action === 'navigate') {
       if (!payload.value) {
         return { success: false, message: 'URL is required for navigate action in the value field.' };
       }
       
-      await chrome.tabs.update(tab.id, { url: payload.value });
+      let targetUrl = payload.value;
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = 'https://' + targetUrl;
+      }
+      
+      await chrome.tabs.update(tab.id, { url: targetUrl });
       // Auto-wait for navigation to complete
       await new Promise<void>((resolve) => {
         const listener = (tabId: number, info: { status?: string }) => {
@@ -407,7 +408,7 @@ export async function executeBrowserAction(payload: BrowserActionPayload): Promi
           resolve();
         }, 15000);
       });
-      return { success: true, message: `Navigated to ${payload.value} and page loaded.` };
+      return { success: true, message: `Navigated to ${targetUrl} and page loaded.` };
     }
 
     // ── Tab management actions (handled at chrome API level) ──
@@ -430,14 +431,23 @@ export async function executeBrowserAction(payload: BrowserActionPayload): Promi
 
     if (payload.action === 'open_tab') {
       if (!payload.value) return { success: false, message: 'URL (value) is required for open_tab.' };
-      const newTab = await chrome.tabs.create({ url: payload.value });
-      return { success: true, message: `Opened new tab with URL: ${payload.value}`, data: { tabId: newTab.id } };
+      let targetUrl = payload.value;
+      if (!targetUrl.startsWith('http://') && !targetUrl.startsWith('https://')) {
+        targetUrl = 'https://' + targetUrl;
+      }
+      const newTab = await chrome.tabs.create({ url: targetUrl });
+      return { success: true, message: `Opened new tab with URL: ${targetUrl}`, data: { tabId: newTab.id } };
     }
 
     if (payload.action === 'close_tab') {
       const targetTabId = payload.tab_id || tab.id;
       await chrome.tabs.remove(targetTabId);
       return { success: true, message: `Closed tab ${targetTabId}.` };
+    }
+
+    // Now enforce DOM restrictions: We cannot run executeScript on chrome:// or chrome-extension://
+    if (tab.url?.startsWith('chrome://') || tab.url?.startsWith('chrome-extension://') || tab.url?.startsWith('edge://')) {
+      return { success: false, message: 'Cannot perform DOM interactions (click, type, read, etc.) on system or extension pages. You can use open_tab or navigate to go to a standard web page first.' };
     }
 
     // ── Wait actions ──
