@@ -15,14 +15,16 @@ export function FeedbackSettings() {
       </div>
 
       <div 
-        className="flex-1 w-full bg-white dark:bg-[#1e1e24] rounded-xl overflow-hidden border border-[var(--border-color)] shadow-sm"
-        style={{ minHeight: '500px' }}
+        style={{ height: '600px', width: '100%', borderRadius: '12px', overflow: 'hidden', border: '1px solid var(--border)' }}
       >
         <Widget 
           id={typeformId} 
-          style={{ width: '100%', height: '100%' }} 
+          style={{ width: '100%', height: '100%' }}
           className="my-typeform-widget"
           transitiveSearchParams={true}
+          hideHeaders={true}
+          hideFooter={true}
+          opacity={0}
           iframeProps={{ title: 'AI Sidebar Feedback Form' }}
         />
       </div>
