@@ -41,6 +41,10 @@ export function MarkdownRenderer({ content, isStreaming }: MarkdownRendererProps
               </code>
             );
           },
+          // Override pre to avoid double-wrapping, as CodeBlock renders its own container
+          pre({ children }) {
+            return <>{children}</>;
+          },
           // Open links in new tab
           a({ href, children, ...props }) {
             return (

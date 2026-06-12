@@ -33,10 +33,10 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
   return (
     <div style={{
       borderRadius: 'var(--radius-md)',
-      border: '1px solid var(--code-border)',
+      border: '1px solid #333333',
       overflow: 'hidden',
       margin: '12px 0',
-      background: 'var(--code-bg)',
+      background: '#1e1e1e',
       boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
     }}>
       {/* Header */}
@@ -45,10 +45,10 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
         alignItems: 'center',
         justifyContent: 'space-between',
         padding: '6px 12px',
-        background: 'var(--bg-tertiary)',
-        borderBottom: '1px solid var(--code-border)',
+        background: '#252526',
+        borderBottom: '1px solid #333333',
         fontSize: '0.75rem',
-        color: 'var(--text-secondary)',
+        color: '#9cdcfe',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
           {lineCount > 10 && (
@@ -57,7 +57,7 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
               style={{
                 background: 'none',
                 border: 'none',
-                color: 'var(--text-secondary)',
+                color: '#9cdcfe',
                 cursor: 'pointer',
                 padding: 0,
                 display: 'flex',
@@ -70,7 +70,7 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
           <span style={{ fontFamily: 'var(--font-mono)', fontWeight: 500 }}>
             {filename || displayLang}
           </span>
-          <span style={{ color: 'var(--text-muted)' }}>
+          <span style={{ color: '#6a9955' }}>
             {lineCount} lines
           </span>
         </div>
@@ -83,9 +83,9 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
                 display: 'flex',
                 alignItems: 'center',
                 gap: 4,
-                background: isPreview ? 'var(--accent-subtle)' : 'transparent',
+                background: isPreview ? 'rgba(124, 92, 245, 0.15)' : 'transparent',
                 border: 'none',
-                color: isPreview ? 'var(--accent)' : 'var(--text-secondary)',
+                color: isPreview ? '#7c5cf5' : '#cccccc',
                 cursor: 'pointer',
                 padding: '2px 8px',
                 borderRadius: 'var(--radius-sm)',
@@ -95,10 +95,10 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
                 fontWeight: 500,
               }}
               onMouseEnter={(e) => {
-                if (!isPreview) e.currentTarget.style.color = 'var(--text-primary)';
+                if (!isPreview) e.currentTarget.style.color = '#ffffff';
               }}
               onMouseLeave={(e) => {
-                if (!isPreview) e.currentTarget.style.color = 'var(--text-secondary)';
+                if (!isPreview) e.currentTarget.style.color = '#cccccc';
               }}
             >
               {isPreview ? <Code size={13} /> : <Play size={13} />}
@@ -114,7 +114,7 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
               gap: 4,
               background: 'none',
               border: 'none',
-              color: copied ? 'var(--success)' : 'var(--text-secondary)',
+              color: copied ? '#4caf50' : '#cccccc',
               cursor: 'pointer',
               padding: '2px 6px',
               borderRadius: 'var(--radius-sm)',
@@ -123,10 +123,10 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
               fontFamily: 'var(--font-sans)',
             }}
             onMouseEnter={(e) => {
-              if (!copied) e.currentTarget.style.color = 'var(--text-primary)';
+              if (!copied) e.currentTarget.style.color = '#ffffff';
             }}
             onMouseLeave={(e) => {
-              if (!copied) e.currentTarget.style.color = 'var(--text-secondary)';
+              if (!copied) e.currentTarget.style.color = '#cccccc';
             }}
           >
             {copied ? <Check size={13} /> : <Copy size={13} />}
@@ -140,12 +140,15 @@ export function CodeBlock({ code, language, filename }: CodeBlockProps) {
         <SyntaxHighlighter
           language={language || 'text'}
           style={vscDarkPlus}
+          PreTag="div"
+          CodeTag="div"
           customStyle={{
             margin: 0,
             padding: '12px 16px',
             border: 'none',
             borderRadius: 0,
             fontSize: '0.85rem',
+            fontFamily: 'var(--font-mono)',
             lineHeight: 1.6,
             background: 'transparent',
             maxHeight: '500px',
